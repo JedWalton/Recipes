@@ -1,0 +1,372 @@
+type: edu
+files:
+- name: src/recipes/RecipesApplication.java
+  visible: true
+  text: |
+    package recipes;
+
+    import org.springframework.boot.SpringApplication;
+    import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+    @SpringBootApplication
+    public class RecipesApplication {
+        public static void main(String[] args) {
+            SpringApplication.run(RecipesApplication.class, args);
+        }
+    }
+  learner_created: false
+- name: src/resources/application.properties
+  visible: true
+  text: |-
+    server.port=8881
+    management.endpoints.web.exposure.include=*
+    management.endpoint.shutdown.enabled=true
+  learner_created: false
+- name: build.gradle
+  visible: true
+  text: |-
+    buildscript {
+        apply plugin: 'hyperskill'
+
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath "org.springframework.boot:spring-boot-gradle-plugin:$hs.spring.bootVersion"
+            classpath "io.spring.gradle:dependency-management-plugin:$hs.spring.dependencyManagementVersion"
+        }
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+    }
+
+    sourceSets.main.resources.srcDirs = ["src/resources"]
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+    }
+  learner_created: false
+- name: test/RecipesApplicationTest.java
+  visible: false
+  text: |
+    import com.google.gson.Gson;
+    import org.hyperskill.hstest.dynamic.DynamicTest;
+    import org.hyperskill.hstest.dynamic.input.DynamicTesting;
+    import org.hyperskill.hstest.exception.outcomes.WrongAnswer;
+    import org.hyperskill.hstest.mocks.web.response.HttpResponse;
+    import org.hyperskill.hstest.stage.SpringTest;
+    import org.hyperskill.hstest.testcase.CheckResult;
+
+    import static org.hyperskill.hstest.testing.expect.json.JsonChecker.*;
+    import static org.hyperskill.hstest.testing.expect.Expectation.expect;
+
+    import recipes.RecipesApplication;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    import static org.hyperskill.hstest.testcase.CheckResult.correct;
+
+
+    public class RecipesApplicationTest extends SpringTest {
+
+        public RecipesApplicationTest() {
+            super(RecipesApplication.class);
+        }
+
+        // Initialization ---
+
+        static class Recipe {
+            final String name;
+            final String description;
+            final String[] ingredients;
+            final String[] directions;
+
+            Recipe(String name, String description, String[] ingredients, String[] directions) {
+                this.name = name;
+                this.description = description;
+                this.ingredients = ingredients;
+                this.directions = directions;
+            }
+        }
+
+        final Recipe[] RECIPES = {
+            new Recipe(
+                "Fresh Mint Tea /Test",
+                "Light, aromatic and refreshing beverage, ... /Test",
+                new String[]{"boiled water", "honey", "fresh mint leaves /Test"},
+                new String[]{"Boil water", "Pour boiling hot water into a mug", "Add fresh mint leaves", "Mix and let the mint leaves seep for 3-5 minutes", "Add honey and mix again /Test"}
+            ),
+
+            new Recipe(
+                "Warming Ginger Tea /Test",
+                "Ginger tea is a warming drink for cool weather, ... /Test",
+                new String[]{"1 inch ginger root, minced", "1/2 lemon, juiced", "1/2 teaspoon manuka honey /Test"},
+                new String[]{"Place all ingredients in a mug and fill with warm water (not too hot so you keep the beneficial honey compounds in tact)", "Steep for 5-10 minutes", "Drink and enjoy /Test"}
+            )
+        };
+
+        final String[] JSON_RECIPES = {
+            new Gson().toJson(RECIPES[0]),
+            new Gson().toJson(RECIPES[1])
+        };
+
+
+        final String API_RECIPE_NEW = "/api/recipe/new";
+        final String API_RECIPE = "/api/recipe/";
+
+        // recipes ids will be saved when testing POST requests and used later to test GET requests
+        final List<Integer> recipeIds = new ArrayList<>();
+
+
+        // Helper functions ---
+
+        static void throwIfIncorrectStatusCode(HttpResponse response, int status) {
+            if (response.getStatusCode() != status) {
+                throw new WrongAnswer(response.getRequest().getMethod() +
+                    " " + response.getRequest().getLocalUri() +
+                    " should respond with status code " + status +
+                    ", responded: " + response.getStatusCode() + "\n\n" +
+                    "Response body:\n" + response.getContent());
+            }
+        }
+
+
+        // Tests ---
+
+        @DynamicTest
+        DynamicTesting[] dt = new DynamicTesting[]{
+            this::testGetRecipeNotFoundStatusCode,
+
+            () -> testPostRecipe(JSON_RECIPES[0]),
+            () -> testPostRecipe(JSON_RECIPES[1]),
+
+            () -> testGetRecipe(recipeIds.get(0), RECIPES[0]),
+            () -> testGetRecipe(recipeIds.get(1), RECIPES[1])
+        };
+
+        CheckResult testPostRecipe(String jsonRecipe) {
+
+            HttpResponse response = post(API_RECIPE_NEW, jsonRecipe).send();
+
+            throwIfIncorrectStatusCode(response, 200);
+
+            expect(response.getContent()).asJson().check(
+                isObject()
+                    .value("id", isInteger(recipeId -> {
+                        recipeIds.add(recipeId);
+                        return true;
+                    })));
+
+            return correct();
+        }
+
+        CheckResult testGetRecipe(int recipeId, Recipe recipe) {
+
+            HttpResponse response = get(API_RECIPE + recipeId).send();
+
+            throwIfIncorrectStatusCode(response, 200);
+
+            expect(response.getContent()).asJson().check(
+                isObject()
+                    .value("name", isString(recipe.name))
+                    .value("description", isString(recipe.description))
+                    .value("ingredients", isArray(recipe.ingredients))
+                    .value("directions", isArray(recipe.directions)));
+
+            return correct();
+        }
+
+        CheckResult testGetRecipeNotFoundStatusCode() {
+            HttpResponse response = get(API_RECIPE + (Integer.MAX_VALUE - 5)).send();
+
+            throwIfIncorrectStatusCode(response, 404);
+
+            return correct();
+        }
+    }
+  learner_created: false
+- name: src/recipes/Controllers/RecipeController.java
+  visible: true
+  text: |-
+    package recipes.Controllers;
+
+    import org.springframework.web.bind.annotation.*;
+    import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+    import recipes.Models.Recipe;
+
+    import java.net.URI;
+
+    @RequestMapping("/api")
+    @RestController
+    public class RecipeController {
+
+        Recipe recipe;
+
+        @PostMapping("/recipe")
+        public void postRecipe(@RequestBody Recipe recipe) {
+            this.recipe = recipe;
+        }
+
+        @GetMapping("/recipe")
+        public Recipe getRecipe() {
+            return this.recipe;
+        }
+    }
+  learner_created: true
+- name: src/recipes/Models/Recipe.java
+  visible: true
+  text: |-
+    package recipes.Models;
+
+
+    public class Recipe {
+        String name;
+        String description;
+        String ingredients;
+        String directions;
+
+        public Recipe() {
+        }
+
+        public Recipe(String name, String description, String ingredients, String directions) {
+            this.name = name;
+            this.description = description;
+            this.ingredients = ingredients;
+            this.directions = directions;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getIngredients() {
+            return ingredients;
+        }
+
+        public void setIngredients(String ingredients) {
+            this.ingredients = ingredients;
+        }
+
+        public String getDirections() {
+            return directions;
+        }
+
+        public void setDirections(String directions) {
+            this.directions = directions;
+        }
+    }
+  learner_created: true
+- name: test/recipes/Controllers/RecipeControllerTest.java
+  visible: true
+  text: |-
+    package recipes.Controllers;
+
+    import org.junit.jupiter.api.Test;
+    import org.junit.jupiter.api.extension.ExtendWith;
+    import org.junit.runner.RunWith;
+
+    import static org.junit.jupiter.api.Assertions.*;
+
+
+    public class RecipeControllerTest {
+
+        @Test
+        void postRecipe() {
+        }
+
+        @Test
+        void getRecipe() {
+        }
+    }
+  learner_created: false
+- name: src/resources/static/index.html
+  visible: true
+  text: |-
+    <!DOCTYPE html>
+    <html>
+    <body>
+
+    <h1>My First Heading</h1>
+    <p>My first paragraph.</p>
+
+    </body>
+    </html>
+  learner_created: true
+feedback_link: https://hyperskill.org/learn/step/13089#comment
+status: Failed
+feedback:
+  message: "Exception in test #1\n\nCannot start Spring application\n\norg.springframework.context.ApplicationContextException:\
+    \ Failed to start bean &#39;webServerStartStop&#39;; nested exception is org.springframework.boot.web.server.PortInUseException:\
+    \ Port 8881 is already in use\n\tat org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:181)\n\
+    \tat org.springframework.context.support.DefaultLifecycleProcessor.access$200(DefaultLifecycleProcessor.java:54)\n\
+    \tat org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.start(DefaultLifecycleProcessor.java:356)\n\
+    \tat java.base/java.lang.Iterable.forEach(Iterable.java:75)\n\tat org.springframework.context.support.DefaultLifecycleProcessor.startBeans(DefaultLifecycleProcessor.java:155)\n\
+    \tat org.springframework.context.support.DefaultLifecycleProcessor.onRefresh(DefaultLifecycleProcessor.java:123)\n\
+    \tat org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:935)\n\
+    \tat org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:586)\n\
+    \tat org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)\n\
+    \tat org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)\n\
+    \tat org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:434)\n\
+    \tat org.springframework.boot.SpringApplication.run(SpringApplication.java:338)\n\
+    \tat org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)\n\
+    \tat org.springframework.boot.SpringApplication.run(SpringApplication.java:1332)\n\
+    \tat recipes.RecipesApplication.main(RecipesApplication.java:9)\n\nPlease find\
+    \ below the output of your program during this failed test.\n\n---\n\n.   ____\
+    \          _            __ _ _\n /\\\\ / ___&#39;_ __ _ _(_)_ __  __ _ \\ \\ \\\
+    \ \\\n( ( )\\___ | &#39;_ | &#39;_| | &#39;_ \\/ _` | \\ \\ \\ \\\n \\\\/  ___)|\
+    \ |_)| | | | | || (_| |  ) ) ) )\n  &#39;  |____| .__|_| |_|_| |_\\__, | / / /\
+    \ /\n =========|_|==============|___/=/_/_/_/\n :: Spring Boot ::            \
+    \    (v2.5.6)\n\n2022-04-21 22:11:53.764  INFO 62410 --- [    Test worker] recipes.RecipesApplication\
+    \               : Starting RecipesApplication using Java 17.0.1 on PC with PID\
+    \ 62410 (started by jed in /home/jed/IdeaProjects/Recipes/Recipes/task)\n2022-04-21\
+    \ 22:11:53.767  INFO 62410 --- [    Test worker] recipes.RecipesApplication  \
+    \             : No active profile set, falling back to default profiles: default\n\
+    2022-04-21 22:11:54.549  INFO 62410 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer\
+    \  : Tomcat initialized with port(s): 8881 (http)\n2022-04-21 22:11:54.556  INFO\
+    \ 62410 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting\
+    \ service [Tomcat]\n2022-04-21 22:11:54.557  INFO 62410 --- [    Test worker]\
+    \ org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache\
+    \ Tomcat/9.0.54]\n2022-04-21 22:11:54.603  INFO 62410 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]\
+    \       : Initializing Spring embedded WebApplicationContext\n2022-04-21 22:11:54.603\
+    \  INFO 62410 --- [    Test worker] w.s.c.ServletWebServerApplicationContext :\
+    \ Root WebApplicationContext: initialization completed in 798 ms\n2022-04-21 22:11:54.911\
+    \  INFO 62410 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    :\
+    \ Adding welcome page: class path resource [static/index.html]\n2022-04-21 22:11:55.126\
+    \  INFO 62410 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      :\
+    \ Exposing 14 endpoint(s) beneath base path &#39;/actuator&#39;\n2022-04-21 22:11:55.157\
+    \  WARN 62410 --- [    Test worker] ConfigServletWebServerApplicationContext :\
+    \ Exception encountered during context initialization - cancelling refresh attempt:\
+    \ org.springframework.context.ApplicationContextException: Failed to start bean\
+    \ &#39;webServerStartStop&#39;; nested exception is org.springframework.boot.web.server.PortInUseException:\
+    \ Port 8881 is already in use\n2022-04-21 22:11:55.165  INFO 62410 --- [    Test\
+    \ worker] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]\n\
+    2022-04-21 22:11:55.179  INFO 62410 --- [    Test worker] ConditionEvaluationReportLoggingListener\
+    \ : \n\nError starting ApplicationContext. To display the conditions report re-run\
+    \ your application with &#39;debug&#39; enabled.\n2022-04-21 22:11:55.188 ERROR\
+    \ 62410 --- [    Test worker] o.s.b.d.LoggingFailureAnalysisReporter   : \n\n\
+    ***************************\nAPPLICATION FAILED TO START\n***************************\n\
+    \nDescription:\n\nWeb server failed to start. Port 8881 was already in use.\n\n\
+    Action:\n\nIdentify and stop the process that&#39;s listening on port 8881 or\
+    \ configure this application to listen on another port."
+  time: Thu, 21 Apr 2022 21:11:55 UTC
+record: 2
