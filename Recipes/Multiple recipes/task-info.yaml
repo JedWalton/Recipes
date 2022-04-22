@@ -276,29 +276,67 @@ files:
         }
     }
   learner_created: true
-- name: test/recipes/Controllers/RecipeControllerTest.java
+- name: src/recipes/Models/RecipeDAO.java
   visible: true
   text: |-
-    package recipes.Controllers;
+    package recipes.Models;
 
-    import org.junit.jupiter.api.Test;
-    import org.junit.jupiter.api.extension.ExtendWith;
-    import org.junit.runner.RunWith;
+    import org.springframework.stereotype.Component;
 
-    import static org.junit.jupiter.api.Assertions.*;
+    @Component
+    public class RecipeDAO implements Dao<Recipe>{
 
+        Recipe recipe;
 
-    public class RecipeControllerTest {
-
-        @Test
-        void postRecipe() {
+        public RecipeDAO() {
         }
 
-        @Test
-        void getRecipe() {
+        @Override
+        public boolean post(Recipe recipe) {
+            try {
+                this.recipe = recipe;
+            } catch(Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public Recipe get() {
+            return recipe;
         }
     }
-  learner_created: false
+  learner_created: true
+- name: src/recipes/Models/Dao.java
+  visible: true
+  text: |-
+    package recipes.Models;
+
+    import java.util.List;
+    import java.util.Optional;
+
+
+    public interface Dao<T> {
+
+        boolean post(T t);
+
+        T get();
+
+    }
+  learner_created: true
+- name: test/recipes/Controllers/RecipeControllerTest.java
+  visible: true
+  learner_created: true
+- name: test/recipes/Models/DaoTestBase.java
+  visible: true
+  learner_created: true
+- name: test/recipes/Models/RecipeDAOTest.java
+  visible: true
+  learner_created: true
+- name: test/recipes/Models/RecipeTest.java
+  visible: true
+  learner_created: true
 - name: src/resources/static/index.html
   visible: true
   text: |-
@@ -315,58 +353,39 @@ files:
 feedback_link: https://hyperskill.org/learn/step/13089#comment
 status: Failed
 feedback:
-  message: "Exception in test #1\n\nCannot start Spring application\n\norg.springframework.context.ApplicationContextException:\
-    \ Failed to start bean &#39;webServerStartStop&#39;; nested exception is org.springframework.boot.web.server.PortInUseException:\
-    \ Port 8881 is already in use\n\tat org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:181)\n\
-    \tat org.springframework.context.support.DefaultLifecycleProcessor.access$200(DefaultLifecycleProcessor.java:54)\n\
-    \tat org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.start(DefaultLifecycleProcessor.java:356)\n\
-    \tat java.base/java.lang.Iterable.forEach(Iterable.java:75)\n\tat org.springframework.context.support.DefaultLifecycleProcessor.startBeans(DefaultLifecycleProcessor.java:155)\n\
-    \tat org.springframework.context.support.DefaultLifecycleProcessor.onRefresh(DefaultLifecycleProcessor.java:123)\n\
-    \tat org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:935)\n\
-    \tat org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:586)\n\
-    \tat org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)\n\
-    \tat org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)\n\
-    \tat org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:434)\n\
-    \tat org.springframework.boot.SpringApplication.run(SpringApplication.java:338)\n\
-    \tat org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)\n\
-    \tat org.springframework.boot.SpringApplication.run(SpringApplication.java:1332)\n\
-    \tat recipes.RecipesApplication.main(RecipesApplication.java:9)\n\nPlease find\
-    \ below the output of your program during this failed test.\n\n---\n\n.   ____\
-    \          _            __ _ _\n /\\\\ / ___&#39;_ __ _ _(_)_ __  __ _ \\ \\ \\\
-    \ \\\n( ( )\\___ | &#39;_ | &#39;_| | &#39;_ \\/ _` | \\ \\ \\ \\\n \\\\/  ___)|\
-    \ |_)| | | | | || (_| |  ) ) ) )\n  &#39;  |____| .__|_| |_|_| |_\\__, | / / /\
-    \ /\n =========|_|==============|___/=/_/_/_/\n :: Spring Boot ::            \
-    \    (v2.5.6)\n\n2022-04-21 22:11:53.764  INFO 62410 --- [    Test worker] recipes.RecipesApplication\
-    \               : Starting RecipesApplication using Java 17.0.1 on PC with PID\
-    \ 62410 (started by jed in /home/jed/IdeaProjects/Recipes/Recipes/task)\n2022-04-21\
-    \ 22:11:53.767  INFO 62410 --- [    Test worker] recipes.RecipesApplication  \
-    \             : No active profile set, falling back to default profiles: default\n\
-    2022-04-21 22:11:54.549  INFO 62410 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer\
-    \  : Tomcat initialized with port(s): 8881 (http)\n2022-04-21 22:11:54.556  INFO\
-    \ 62410 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting\
-    \ service [Tomcat]\n2022-04-21 22:11:54.557  INFO 62410 --- [    Test worker]\
-    \ org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache\
-    \ Tomcat/9.0.54]\n2022-04-21 22:11:54.603  INFO 62410 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]\
-    \       : Initializing Spring embedded WebApplicationContext\n2022-04-21 22:11:54.603\
-    \  INFO 62410 --- [    Test worker] w.s.c.ServletWebServerApplicationContext :\
-    \ Root WebApplicationContext: initialization completed in 798 ms\n2022-04-21 22:11:54.911\
-    \  INFO 62410 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    :\
-    \ Adding welcome page: class path resource [static/index.html]\n2022-04-21 22:11:55.126\
-    \  INFO 62410 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      :\
-    \ Exposing 14 endpoint(s) beneath base path &#39;/actuator&#39;\n2022-04-21 22:11:55.157\
-    \  WARN 62410 --- [    Test worker] ConfigServletWebServerApplicationContext :\
-    \ Exception encountered during context initialization - cancelling refresh attempt:\
-    \ org.springframework.context.ApplicationContextException: Failed to start bean\
-    \ &#39;webServerStartStop&#39;; nested exception is org.springframework.boot.web.server.PortInUseException:\
-    \ Port 8881 is already in use\n2022-04-21 22:11:55.165  INFO 62410 --- [    Test\
-    \ worker] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]\n\
-    2022-04-21 22:11:55.179  INFO 62410 --- [    Test worker] ConditionEvaluationReportLoggingListener\
-    \ : \n\nError starting ApplicationContext. To display the conditions report re-run\
-    \ your application with &#39;debug&#39; enabled.\n2022-04-21 22:11:55.188 ERROR\
-    \ 62410 --- [    Test worker] o.s.b.d.LoggingFailureAnalysisReporter   : \n\n\
-    ***************************\nAPPLICATION FAILED TO START\n***************************\n\
-    \nDescription:\n\nWeb server failed to start. Port 8881 was already in use.\n\n\
-    Action:\n\nIdentify and stop the process that&#39;s listening on port 8881 or\
-    \ configure this application to listen on another port."
-  time: Thu, 21 Apr 2022 21:11:55 UTC
+  message: |-
+    Wrong answer in test #2
+
+    POST /api/recipe/new should respond with status code 200, responded: 404
+
+    Response body:
+    {&quot;timestamp&quot;:&quot;2022-04-22T13:18:34.523+00:00&quot;,&quot;status&quot;:404,&quot;error&quot;:&quot;Not Found&quot;,&quot;path&quot;:&quot;/api/recipe/new&quot;}
+
+    Please find below the output of your program during this failed test.
+
+    ---
+
+    .   ____          _            __ _ _
+     /\\ / ___&#39;_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | &#39;_ | &#39;_| | &#39;_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      &#39;  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+     :: Spring Boot ::                (v2.5.6)
+
+    2022-04-22 14:18:33.242  INFO 23779 --- [    Test worker] recipes.RecipesApplication               : Starting RecipesApplication using Java 17.0.1 on PC with PID 23779 (started by jed in /home/jed/IdeaProjects/Recipes/Recipes/task)
+    2022-04-22 14:18:33.244  INFO 23779 --- [    Test worker] recipes.RecipesApplication               : No active profile set, falling back to default profiles: default
+    2022-04-22 14:18:33.904  INFO 23779 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8881 (http)
+    2022-04-22 14:18:33.909  INFO 23779 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2022-04-22 14:18:33.910  INFO 23779 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.54]
+    2022-04-22 14:18:33.948  INFO 23779 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+    2022-04-22 14:18:33.948  INFO 23779 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 668 ms
+    2022-04-22 14:18:34.144  INFO 23779 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+    2022-04-22 14:18:34.260  INFO 23779 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path &#39;/actuator&#39;
+    2022-04-22 14:18:34.281  INFO 23779 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8881 (http) with context path &#39;&#39;
+    2022-04-22 14:18:34.289  INFO 23779 --- [    Test worker] recipes.RecipesApplication               : Started RecipesApplication in 1.218 seconds (JVM running for 1.586)
+    2022-04-22 14:18:34.464  INFO 23779 --- [nio-8881-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet &#39;dispatcherServlet&#39;
+    2022-04-22 14:18:34.465  INFO 23779 --- [nio-8881-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet &#39;dispatcherServlet&#39;
+    2022-04-22 14:18:34.466  INFO 23779 --- [nio-8881-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+  time: Fri, 22 Apr 2022 13:18:34 UTC
 record: 2

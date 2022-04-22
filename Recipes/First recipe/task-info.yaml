@@ -173,9 +173,6 @@ files:
 - name: src/resources/static/index.html
   visible: true
   learner_created: true
-- name: test/recipes/Controllers/RecipeControllerTest.java
-  visible: true
-  learner_created: true
 - name: src/recipes/Controllers/RecipeController.java
   visible: true
   learner_created: true
@@ -188,9 +185,12 @@ files:
 - name: src/recipes/Models/Dao.java
   visible: true
   learner_created: true
+- name: test/recipes/Controllers/RecipeControllerTest.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/13088#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: Thu, 21 Apr 2022 21:26:22 UTC
+  time: Fri, 22 Apr 2022 13:17:32 UTC
 record: 1

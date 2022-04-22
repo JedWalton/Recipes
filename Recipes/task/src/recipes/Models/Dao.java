@@ -6,16 +6,8 @@ import java.util.Optional;
 
 public interface Dao<T> {
 
-    Optional<T> get(long id);
+    boolean post(T t);
 
-    List<T> getAll();
-
-    boolean save(T t);
-
-    boolean update(T t, String[] params);
-
-    boolean delete(T t);
-
-    // ADDED FOR STAGE 1/5
     T get();
+
 }
