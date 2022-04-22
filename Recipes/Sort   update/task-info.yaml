@@ -638,6 +638,15 @@ files:
 - name: test/recipes/Controllers/RecipeControllerTest.java
   visible: true
   learner_created: false
+- name: test/recipes/Models/DaoTestBase.java
+  visible: true
+  learner_created: false
+- name: test/recipes/Models/RecipeDAOTest.java
+  visible: true
+  learner_created: false
+- name: test/recipes/Models/RecipeTest.java
+  visible: true
+  learner_created: false
 feedback_link: https://hyperskill.org/learn/step/13091#comment
 status: Unchecked
 record: -1

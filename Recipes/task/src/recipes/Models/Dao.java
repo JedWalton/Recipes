@@ -6,8 +6,7 @@ import java.util.Optional;
 
 public interface Dao<T> {
 
-    boolean post(T t);
+    long post(T t);
 
-    T get();
-
+    T get(long id);
 }

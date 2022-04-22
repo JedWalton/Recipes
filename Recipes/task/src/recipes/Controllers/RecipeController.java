@@ -6,20 +6,19 @@ import recipes.Models.Recipe;
 import recipes.Models.RecipeDAO;
 
 
-@RequestMapping("/api")
+@RequestMapping("/api/recipe")
 @RestController
 public class RecipeController {
 
-    @Autowired
     private RecipeDAO recipeDAO;
 
-    @PostMapping("/recipe")
+    @PostMapping("/new")
     public void postRecipe(@RequestBody Recipe recipe) {
         this.recipeDAO.post(recipe);
     }
 
-    @GetMapping("/recipe")
-    public Recipe getRecipe() {
-        return this.recipeDAO.get();
+    @GetMapping("/")
+    public Recipe getRecipe(long id) {
+        return this.recipeDAO.get(id);
     }
 }
