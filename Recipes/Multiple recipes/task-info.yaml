@@ -276,55 +276,6 @@ files:
         }
     }
   learner_created: true
-- name: src/recipes/Models/RecipeDAO.java
-  visible: true
-  text: |-
-    package recipes.Models;
-
-    import org.springframework.stereotype.Component;
-
-    @Component
-    public class RecipeDAO implements Dao<Recipe>{
-
-        Recipe recipe;
-
-        public RecipeDAO() {
-        }
-
-        @Override
-        public boolean post(Recipe recipe) {
-            try {
-                this.recipe = recipe;
-            } catch(Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public Recipe get() {
-            return recipe;
-        }
-    }
-  learner_created: true
-- name: src/recipes/Models/Dao.java
-  visible: true
-  text: |-
-    package recipes.Models;
-
-    import java.util.List;
-    import java.util.Optional;
-
-
-    public interface Dao<T> {
-
-        boolean post(T t);
-
-        T get();
-
-    }
-  learner_created: true
 - name: src/resources/static/index.html
   visible: true
   text: |-

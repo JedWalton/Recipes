@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/529086/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: Fri, 22 Apr 2022 17:16:41 UTC
+update_date: Thu, 28 Apr 2022 01:03:49 UTC
 stages:
 - id: 917
   step: 13088
@@ -13,7 +13,7 @@ stages:
   is_completed: true
 - id: 919
   step: 13090
-  is_completed: false
+  is_completed: true
 - id: 920
   step: 13091
   is_completed: false
@@ -36,7 +36,7 @@ topics:
     theory_id: 6569
   - title: Immutability
     theory_id: 7929
-  - title: Introduction to operating systems
+  - title: Introduction to Operating systems
     theory_id: 9704
   - title: Computer algorithms
     theory_id: 16547
@@ -48,7 +48,7 @@ topics:
     theory_id: 6434
   - title: HTTP URL
     theory_id: 6740
-  - title: Tags and attributes
+  - title: Tags and Attributes
     theory_id: 7536
   - title: HTML page structure
     theory_id: 6491
@@ -74,6 +74,8 @@ topics:
     theory_id: 13334
   - title: Computer programming
     theory_id: 8739
+  - title: Paradigms
+    theory_id: 15860
   - title: Introduction to Java
     theory_id: 3500
   - title: Basic literals
@@ -114,8 +116,6 @@ topics:
     theory_id: 3507
   - title: Switch statement
     theory_id: 3504
-  - title: Characters
-    theory_id: 3514
   - title: Sizes and ranges
     theory_id: 3532
   - title: Type casting
@@ -128,8 +128,6 @@ topics:
     theory_id: 3489
   - title: Functional decomposition
     theory_id: 10570
-  - title: String
-    theory_id: 3523
   - title: Primitive and reference types
     theory_id: 5035
   - title: Array
@@ -140,6 +138,10 @@ topics:
     theory_id: 3525
   - title: Iterating over arrays
     theory_id: 3602
+  - title: Characters
+    theory_id: 3514
+  - title: String
+    theory_id: 3523
   - title: Final variables
     theory_id: 7427
   - title: Errors in programs
@@ -158,14 +160,16 @@ topics:
     theory_id: 3552
   - title: Web development
     theory_id: 13931
+  - title: Build tools
+    theory_id: 4284
+  - title: External resources
+    theory_id: 6216
   - title: Command line overview
     theory_id: 8977
-  - title: Parameters and options
+  - title: Parameters and Options
     theory_id: 9746
   - title: Java Archive
     theory_id: 4311
-  - title: Build tools
-    theory_id: 4284
   - title: Gradle basics
     theory_id: 5075
   - title: Basic project with Gradle
@@ -174,8 +178,6 @@ topics:
     theory_id: 7917
   - title: Dependency management
     theory_id: 5076
-  - title: External resources
-    theory_id: 6216
   - title: Pseudocode
     theory_id: 15090
   - title: Fixed-size array
@@ -308,6 +310,8 @@ topics:
     theory_id: 14771
   - title: CRUD repositories
     theory_id: 18031
+  - title: Scopes of beans
+    theory_id: 19487
   - title: Application layers
     theory_id: 13971
   - title: Introduction to databases
