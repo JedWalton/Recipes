@@ -635,6 +635,171 @@ files:
         }
     }
   learner_created: false
+- name: src/recipes/presentation/RecipeController.java
+  visible: true
+  text: |-
+    package recipes.presentation;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.*;
+    import recipes.business.Recipe;
+    import recipes.business.RecipeService;
+
+    import javax.validation.Valid;
+
+    @RestController
+    @RequestMapping("/api")
+    public class RecipeController {
+        final RecipeService recipeService;
+
+        @Autowired
+        public RecipeController(RecipeService recipeService) {
+            this.recipeService = recipeService;
+        }
+
+        @PostMapping("/recipe/new")
+        public Object postRecipe(@Valid @RequestBody Recipe recipe) {
+            Recipe newRecipe = recipeService.save(recipe);
+            return String.format("{\"id\": %d}", newRecipe.getId());
+        }
+
+        @GetMapping("/recipe/{id}")
+        public Recipe getRecipe(@PathVariable long id) {
+            return recipeService.findRecipeById(id);
+        }
+
+        @DeleteMapping("/recipe/{id}")
+        @ResponseStatus(code = HttpStatus.NO_CONTENT)
+        public void deleteRecipe(@PathVariable long id) {
+            recipeService.deleteRecipeById(id);
+        }
+    }
+  learner_created: true
+- name: src/resources/static/index.html
+  visible: true
+  text: |-
+    <!DOCTYPE html>
+    <html>
+    <body>
+
+    <h1>My First Heading</h1>
+    <p>My first paragraph.</p>
+
+    </body>
+    </html>
+  learner_created: true
+- name: src/recipes/persistance/RecipeRepository.java
+  visible: true
+  text: |-
+    package recipes.persistance;
+
+
+    import org.springframework.data.repository.CrudRepository;
+    import org.springframework.stereotype.Repository;
+    import recipes.business.Recipe;
+
+    @Repository
+    public interface RecipeRepository extends CrudRepository<Recipe, Long> {
+
+    }
+  learner_created: true
+- name: src/recipes/business/Recipe.java
+  visible: true
+  text: |-
+    package recipes.business;
+
+    import com.fasterxml.jackson.annotation.JsonProperty;
+    import lombok.*;
+    import org.hibernate.Hibernate;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.NotNull;
+    import javax.validation.constraints.Size;
+    import java.util.List;
+    import java.util.Objects;
+
+    @Getter
+    @Setter
+    @ToString
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    @Entity
+    @Table(name = "recipe")
+    public class Recipe {
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        private Long id;
+
+        @NotBlank(message = "Name is mandatory")
+        private String name;
+
+        @NotBlank(message = "Description is mandatory")
+        private String description;
+
+        @NotNull(message = "Ingredients shouldn't be null")
+        @Size(min = 1, message = "Minimal size should be 1")
+        @ElementCollection
+        private List<String> ingredients;
+
+        @NotNull(message = "Directions shouldn't be null")
+        @Size(min = 1, message = "Minimal size should be 1")
+        @ElementCollection
+        private List<String> directions;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+            Recipe recipe = (Recipe) o;
+            return id != null && Objects.equals(id, recipe.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return getClass().hashCode();
+        }
+    }
+  learner_created: true
+- name: src/recipes/business/RecipeService.java
+  visible: true
+  text: |-
+    package recipes.business;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.stereotype.Service;
+    import org.springframework.web.server.ResponseStatusException;
+    import recipes.persistance.RecipeRepository;
+
+    @Service
+    public class RecipeService {
+        private final RecipeRepository recipeRepository;
+
+        @Autowired
+        public RecipeService(RecipeRepository recipeRepository) {
+            this.recipeRepository = recipeRepository;
+        }
+
+        public Recipe save(Recipe newRecipe) {
+            return recipeRepository.save(newRecipe);
+        }
+
+        public Recipe findRecipeById(Long id) {
+            return recipeRepository.findById(id)
+                    .orElseThrow(() ->
+                            new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                    "Recipe not found for id = " + id));
+        }
+
+        public void deleteRecipeById(Long id) {
+            Recipe recipe = findRecipeById(id);
+            recipeRepository.delete(recipe);
+        }
+    }
+  learner_created: true
 - name: test/recipes/Controllers/RecipeControllerTest.java
   visible: true
   learner_created: false
@@ -648,5 +813,8 @@ files:
   visible: true
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/13091#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Fri, 29 Apr 2022 17:40:52 UTC
 record: -1

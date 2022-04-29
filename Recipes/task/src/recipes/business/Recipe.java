@@ -1,55 +1,57 @@
 package recipes.business;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import org.hibernate.Hibernate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
-@AllArgsConstructor
+@Data
 @Entity
-@Table(name = "recipe")
 public class Recipe {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
+    @GeneratedValue
+    @Setter(AccessLevel.NONE)
     private Long id;
 
-    @NotBlank(message = "Name is mandatory")
+    @NotBlank(message = "name can not blank")
     private String name;
 
-    @NotBlank(message = "Description is mandatory")
+    @NotBlank(message = "description can not blank")
     private String description;
 
-    @NotNull(message = "Ingredients shouldn't be null")
-    @Size(min = 1, message = "Minimal size should be 1")
+    @NotBlank(message = "category can not blank")
+    private String category;
+
+    @UpdateTimestamp
+    private LocalDateTime date;
+
+    @NotEmpty(message = "ingredients can not empty")
+    @Size(min = 1, message = "ingredients must >= 1")
     @ElementCollection
     private List<String> ingredients;
 
-    @NotNull(message = "Directions shouldn't be null")
-    @Size(min = 1, message = "Minimal size should be 1")
+    @NotEmpty(message = "directions can not empty")
+    @Size(min = 1, message = "directions must >= 1")
     @ElementCollection
     private List<String> directions;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Recipe recipe = (Recipe) o;
-        return id != null && Objects.equals(id, recipe.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
+    public void copyOf(Recipe recipe) {
+        name = recipe.name;
+        description = recipe.description;
+        category = recipe.category;
+        ingredients = recipe.ingredients;
+        directions = recipe.directions;
     }
 }

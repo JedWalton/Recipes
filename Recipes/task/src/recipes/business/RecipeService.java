@@ -1,10 +1,11 @@
 package recipes.business;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import recipes.persistance.RecipeRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecipeService {
@@ -15,19 +16,40 @@ public class RecipeService {
         this.recipeRepository = recipeRepository;
     }
 
-    public Recipe save(Recipe newRecipe) {
-        return recipeRepository.save(newRecipe);
+    public Optional<Recipe> findById(long id) {
+        return recipeRepository.findById(id);
     }
 
-    public Recipe findRecipeById(Long id) {
-        return recipeRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                "Recipe not found for id = " + id));
+    public long add(Recipe recipe) {
+        return recipeRepository.save(recipe).getId();
     }
 
-    public void deleteRecipeById(Long id) {
-        Recipe recipe = findRecipeById(id);
-        recipeRepository.delete(recipe);
+    public boolean deleteById(long id) {
+        if (recipeRepository.existsById(id)) {
+            recipeRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean updateById(long id, Recipe recipe) {
+        Optional<Recipe> optional = recipeRepository.findById(id);
+        if (optional.isPresent()) {
+            Recipe oldRecipe = optional.get();
+            oldRecipe.copyOf(recipe);
+            recipeRepository.save(oldRecipe);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public List<Recipe> findByCategory(String category) {
+        return recipeRepository.findByCategoryIgnoreCaseOrderByDateDesc(category);
+    }
+
+    public List<Recipe> findByName(String name) {
+        return recipeRepository.findByNameContainingIgnoreCaseOrderByDateDesc(name);
     }
 }

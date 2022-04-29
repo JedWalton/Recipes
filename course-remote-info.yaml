@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/529086/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: Thu, 28 Apr 2022 01:03:49 UTC
+update_date: Thu, 28 Apr 2022 14:38:13 UTC
 stages:
 - id: 917
   step: 13088
@@ -16,7 +16,7 @@ stages:
   is_completed: true
 - id: 920
   step: 13091
-  is_completed: false
+  is_completed: true
 - id: 921
   step: 13092
   is_completed: false
@@ -34,12 +34,12 @@ topics:
     theory_id: 6633
   - title: HyperText Transfer Protocol
     theory_id: 6569
+  - title: Computer algorithms
+    theory_id: 16547
   - title: Immutability
     theory_id: 7929
   - title: Introduction to Operating systems
     theory_id: 9704
-  - title: Computer algorithms
-    theory_id: 16547
   - title: The big O notation
     theory_id: 16699
   - title: Data structures
@@ -160,6 +160,10 @@ topics:
     theory_id: 3552
   - title: Web development
     theory_id: 13931
+  - title: Pseudocode
+    theory_id: 15090
+  - title: Pseudocode basics
+    theory_id: 19510
   - title: Build tools
     theory_id: 4284
   - title: External resources
@@ -178,8 +182,6 @@ topics:
     theory_id: 7917
   - title: Dependency management
     theory_id: 5076
-  - title: Pseudocode
-    theory_id: 15090
   - title: Fixed-size array
     theory_id: 7255
   - title: Dynamic array
