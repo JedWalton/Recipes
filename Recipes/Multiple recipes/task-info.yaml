@@ -193,7 +193,7 @@ files:
         }
     }
   learner_created: false
-- name: src/recipes/Controllers/RecipeController.java
+- name: src/recipes/Controllers/RecipeRestController.java
   visible: true
   text: |-
     package recipes.Controllers;

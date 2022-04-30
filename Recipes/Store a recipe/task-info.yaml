@@ -327,7 +327,7 @@ files:
 - name: src/recipes/persistance/RecipeRepository.java
   visible: true
   learner_created: true
-- name: src/recipes/presentation/RecipeController.java
+- name: src/recipes/presentation/RecipeRestController.java
   visible: true
   text: |-
     package recipes.Controllers;

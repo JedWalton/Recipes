@@ -814,18 +814,282 @@ files:
         }
     }
   learner_created: false
+- name: src/resources/static/index.html
+  visible: true
+  text: |-
+    <!DOCTYPE html>
+    <html>
+    <body>
+
+    <h1>My First Heading</h1>
+    <p>My first paragraph.</p>
+
+    </body>
+    </html>
+  learner_created: true
 - name: test/recipes/Controllers/RecipeControllerTest.java
   visible: true
-  learner_created: false
+  learner_created: true
 - name: test/recipes/Models/DaoTestBase.java
   visible: true
-  learner_created: false
+  learner_created: true
 - name: test/recipes/Models/RecipeDAOTest.java
   visible: true
-  learner_created: false
+  learner_created: true
 - name: test/recipes/Models/RecipeTest.java
   visible: true
-  learner_created: false
+  learner_created: true
+- name: src/recipes/user/UserRestController.java
+  visible: true
+  learner_created: true
+- name: src/recipes/user/UserRepository.java
+  visible: true
+  learner_created: true
+- name: src/recipes/user/User.java
+  visible: true
+  learner_created: true
+- name: src/recipes/user/UserService.java
+  visible: true
+  learner_created: true
+- name: src/recipes/recipe/RecipeService.java
+  visible: true
+  text: |-
+    package recipes.business;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import recipes.persistance.RecipeRepository;
+
+    import java.util.List;
+    import java.util.Optional;
+
+    @Service
+    public class RecipeService {
+        private final RecipeRepository recipeRepository;
+
+        @Autowired
+        public RecipeService(RecipeRepository recipeRepository) {
+            this.recipeRepository = recipeRepository;
+        }
+
+        public Optional<Recipe> findById(long id) {
+            return recipeRepository.findById(id);
+        }
+
+        public long add(Recipe recipe) {
+            return recipeRepository.save(recipe).getId();
+        }
+
+        public boolean deleteById(long id) {
+            if (recipeRepository.existsById(id)) {
+                recipeRepository.deleteById(id);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public boolean updateById(long id, Recipe recipe) {
+            Optional<Recipe> optional = recipeRepository.findById(id);
+            if (optional.isPresent()) {
+                Recipe oldRecipe = optional.get();
+                oldRecipe.copyOf(recipe);
+                recipeRepository.save(oldRecipe);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public List<Recipe> findByCategory(String category) {
+            return recipeRepository.findByCategoryIgnoreCaseOrderByDateDesc(category);
+        }
+
+        public List<Recipe> findByName(String name) {
+            return recipeRepository.findByNameContainingIgnoreCaseOrderByDateDesc(name);
+        }
+    }
+  learner_created: true
+- name: src/recipes/recipe/Recipe.java
+  visible: true
+  text: |-
+    package recipes.business;
+
+    import com.fasterxml.jackson.annotation.JsonIgnore;
+    import lombok.AccessLevel;
+    import lombok.Data;
+    import lombok.Setter;
+    import org.hibernate.annotations.UpdateTimestamp;
+
+    import javax.persistence.ElementCollection;
+    import javax.persistence.Entity;
+    import javax.persistence.GeneratedValue;
+    import javax.persistence.Id;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.NotEmpty;
+    import javax.validation.constraints.Size;
+    import java.time.LocalDateTime;
+    import java.util.List;
+
+    @Data
+    @Entity
+    public class Recipe {
+        @Id
+        @JsonIgnore
+        @GeneratedValue
+        @Setter(AccessLevel.NONE)
+        private Long id;
+
+        @NotBlank(message = "name can not blank")
+        private String name;
+
+        @NotBlank(message = "description can not blank")
+        private String description;
+
+        @NotBlank(message = "category can not blank")
+        private String category;
+
+        @UpdateTimestamp
+        private LocalDateTime date;
+
+        @NotEmpty(message = "ingredients can not empty")
+        @Size(min = 1, message = "ingredients must >= 1")
+        @ElementCollection
+        private List<String> ingredients;
+
+        @NotEmpty(message = "directions can not empty")
+        @Size(min = 1, message = "directions must >= 1")
+        @ElementCollection
+        private List<String> directions;
+
+        public void copyOf(Recipe recipe) {
+            name = recipe.name;
+            description = recipe.description;
+            category = recipe.category;
+            ingredients = recipe.ingredients;
+            directions = recipe.directions;
+        }
+    }
+  learner_created: true
+- name: src/recipes/recipe/RecipeRepository.java
+  visible: true
+  text: |-
+    package recipes.persistance;
+
+
+    import org.springframework.data.repository.CrudRepository;
+    import org.springframework.stereotype.Component;
+    import recipes.business.Recipe;
+
+    import java.util.List;
+
+    @Component
+    public interface RecipeRepository extends CrudRepository<Recipe, Long> {
+        List<Recipe> findByCategoryIgnoreCaseOrderByDateDesc(String category);
+        List<Recipe> findByNameContainingIgnoreCaseOrderByDateDesc(String name);
+    }
+  learner_created: true
+- name: src/recipes/system/JpaAuditingConfiguration.java
+  visible: true
+  learner_created: true
+- name: src/recipes/system/SecurityConfiguration.java
+  visible: true
+  learner_created: true
+- name: src/recipes/user/RecipesUserDetails.java
+  visible: true
+  learner_created: true
+- name: src/recipes/user/RecipesUserDetailsService.java
+  visible: true
+  learner_created: true
+- name: src/recipes/user/UserJsonViews.java
+  visible: true
+  learner_created: true
+- name: src/recipes/system/AuditorAwareImpl.java
+  visible: true
+  learner_created: true
+- name: src/recipes/recipe/RecipeOwnershipEvaluator.java
+  visible: true
+  learner_created: true
+- name: src/recipes/recipe/UserAlreadyExistException.java
+  visible: true
+  learner_created: true
+- name: src/recipes/recipe/RecipeRestController.java
+  visible: true
+  text: |-
+    package recipes.presentation;
+
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.validation.annotation.Validated;
+    import org.springframework.web.bind.annotation.*;
+    import recipes.business.Recipe;
+    import recipes.business.RecipeService;
+
+    import javax.validation.Valid;
+    import javax.validation.constraints.Min;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.Optional;
+
+    @RestController
+    @Validated
+    @RequestMapping(value = "api/recipe/")
+    public class RecipeController {
+        private final RecipeService recipeService;
+
+        public RecipeController(RecipeService recipeService) {
+            this.recipeService = recipeService;
+        }
+
+        @PostMapping(value = "new")
+        public Map<String, Long> addRecipe(@Valid @RequestBody Recipe recipe) {
+            return Map.of("id", recipeService.add(recipe));
+        }
+
+        @GetMapping(value = "{id}")
+        public ResponseEntity<Recipe> getRecipe(@PathVariable @Min(1) long id) {
+            Optional<Recipe> recipe = recipeService.findById(id);
+            return ResponseEntity.of(recipe);
+        }
+
+        @DeleteMapping(value = "{id}")
+        public ResponseEntity deleteRecipe(@PathVariable @Min(1) long id) {
+            boolean status = recipeService.deleteById(id);
+            return status ?
+                    ResponseEntity.status(204).build() :
+                    ResponseEntity.status(404).build();
+        }
+
+        @PutMapping(value = "{id}")
+        public ResponseEntity updateRecipe(@Valid @RequestBody Recipe recipe, @PathVariable long id) {
+            boolean status = recipeService.updateById(id, recipe);
+            return status ?
+                    ResponseEntity.status(204).build() :
+                    ResponseEntity.status(404).build();
+        }
+
+        @GetMapping(value = "search")
+        public ResponseEntity<List<Recipe>> searchCategory(@RequestParam Map<String, String> param) {
+            if (param.size() == 1 && param.containsKey("category")) {
+                return ResponseEntity.status(200).body(recipeService.findByCategory(param.get("category")));
+            }
+            if (param.size() == 1 && param.containsKey("name")) {
+                return ResponseEntity.status(200).body(recipeService.findByName(param.get("name")));
+            }
+            return ResponseEntity.status(400).build();
+
+        }
+    }
+  learner_created: true
+- name: src/recipes/recipe/RecipeNotFoundException.java
+  visible: true
+  learner_created: true
+- name: src/recipes/recipe/RecipeJsonViews.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/13092#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Sat, 30 Apr 2022 17:36:17 UTC
 record: -1
